@@ -27,7 +27,21 @@ use \pillr\library\http\Message         as  Message;
  * message and return an instance that contains the changed state.
  */
 class Request extends Message implements RequestInterface
-{
+{	
+	private $httpMethod;
+	private $uri;
+	private $requestTarget;
+	
+	function __construct($protocolversion, $httpmethod, $uri=null, $headers, $messageBody) {
+		parent::__construct($protocolversion, $headers, $messageBody);
+		$this->httpMethod=$httpmethod;
+		$this->uri=$uri;
+		if(!empty($this->uri)){
+			$this->requestTarget=$this->uri->__toString();
+		}else{
+			$this->requestTarget="/";
+		}
+	}
 
 
     /**
@@ -48,7 +62,7 @@ class Request extends Message implements RequestInterface
      */
     public function getRequestTarget()
     {
-
+		return $this->requestTarget;
     }
 
     /**
@@ -70,7 +84,10 @@ class Request extends Message implements RequestInterface
      */
     public function withRequestTarget($requestTarget)
     {
-
+		$newURI=new Uri($requestTarget);
+		$this->uri=$newURI;
+		$this->requestTarget=$this->uri->__toString();
+		return $this;
     }
 
     /**
@@ -80,7 +97,7 @@ class Request extends Message implements RequestInterface
      */
     public function getMethod()
     {
-
+		return $this->httpMethod;
     }
 
     /**
@@ -100,7 +117,11 @@ class Request extends Message implements RequestInterface
      */
     public function withMethod($method)
     {
-
+		if($method=="GET" || $method=="POST"){
+			$this->httpMethod=$method;
+			return $this;
+		}
+		throw InvalidArgumentException("Invalid HTTP methods.");
     }
 
     /**
@@ -114,7 +135,7 @@ class Request extends Message implements RequestInterface
      */
     public function getUri()
     {
-
+		return $this->uri;
     }
 
     /**
@@ -149,8 +170,17 @@ class Request extends Message implements RequestInterface
      */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
-
+    	if(!$preserveHost){
+	    	if(empty($uri->getHost())){
+	    		$uri->withHost($this->uri->getHost());
+	    	}			
+    	}else{
+    		if(!empty($this->uri->getHost())){
+    			$uri->withHost($this->uri->getHost());
+    		}	
+    	}
+    	$this->uri=$uri;
+		return $this;
     }
-
 
 }

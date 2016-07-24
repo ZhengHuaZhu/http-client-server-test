@@ -3,7 +3,6 @@ namespace pillr\library\http;
 
 
 use \Psr\Http\Message\ResponseInterface as ResponseInterface;
-
 use \pillr\library\http\Message         as  Message;
 
 /**
@@ -23,6 +22,15 @@ use \pillr\library\http\Message         as  Message;
  */
 class Response extends Message implements ResponseInterface
 {
+	private $statusCode;
+	private $reasonPhrase;
+	
+	function __construct($protocolversion, $statuscode, $reasonphrase, $headers, $messageBody) {
+		parent::__construct($protocolversion, $headers, $messageBody);
+		$this->statusCode=$statuscode;
+		$this->reasonPhrase=$reasonphrase;
+	}
+	
     /**
      * Gets the response status code.
      *
@@ -33,7 +41,7 @@ class Response extends Message implements ResponseInterface
      */
     public function getStatusCode()
     {
-
+		return $this->statusCode;
     }
 
     /**
@@ -58,7 +66,13 @@ class Response extends Message implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = '')
     {
-
+    	$codestr=(string) $code;
+		if(is_numeric($codestr) && strlen($codestr)==3){
+			$this->statusCode=$code;
+			$this->reasonPhrase=$reasonPhrase;
+			return $this;
+		}
+		throw InvalidArgumentException("Invalid status code.");
     }
 
     /**
@@ -76,6 +90,7 @@ class Response extends Message implements ResponseInterface
      */
     public function getReasonPhrase()
     {
-
+		return $this->reasonPhrase;
     }
+    
 }

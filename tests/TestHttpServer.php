@@ -18,6 +18,8 @@ class TestHttpServer extends \PHPUnit_Framework_TestCase {
  // * - Message body
 
         $uri_string = 'https://pillrcompany.com/interns/test?psr=true';
+//         $uri_string2 = 'https://pillrcompany.com';
+//         $uri_string3 = 'https://pillrcompany.com/';
 
         $httpRequest =  new HttpRequest(
             '1.1',
